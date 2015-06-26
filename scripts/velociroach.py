@@ -93,6 +93,10 @@ class Velociroach:
 
     def PIDStopMotors(self):
       self.tx(0, command.PID_STOP_MOTORS)
+    
+    def setMotorSpeeds(self, spleft, spright):
+      thrust = [spleft, 0, spright, 0, 0]
+      self.tx( 0, command.SET_THRUST_CLOSED_LOOP, pack('5h',*thrust))
 
     #TODO: getting flash erase to work is critical to function testing (pullin)    
     #existing VR firmware does not send a packet when the erase is done, so this will hang and retry.

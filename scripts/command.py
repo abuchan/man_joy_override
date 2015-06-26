@@ -51,6 +51,8 @@ BASE_ECHO = 0x3f
 
 # CMD values of 0x80(128) - 0xEF(239) are available for user applications.
 SET_THRUST_OPEN_LOOP    =   0x80
+SET_THRUST_CLOSED_LOOP =    0x81
+#TODO: Change this back if trying to do AMD PID!!!
 PID_START_MOTORS	    =   0x81
 SET_PID_GAINS           =   0x82
 GET_PID_TELEMETRY       =   0x83

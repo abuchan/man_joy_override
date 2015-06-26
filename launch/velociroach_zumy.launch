@@ -1,5 +1,5 @@
 <launch>
   <node pkg="man_joy_override" name="man_joy" type="man_joy_override.py" />
-  <node pkg="man_joy_override" name="roach_bridge" type="roach_bridge.py" />
+  <node pkg="man_joy_override" name="roach_bridge" type="roach_bridge.py" output="screen"/>
   <node pkg="joy" name="joystick" type="joy_node" />
 </launch>
