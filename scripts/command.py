@@ -53,11 +53,11 @@ BASE_ECHO = 0x3f
 SET_THRUST_OPEN_LOOP    =   0x80
 SET_THRUST_CLOSED_LOOP =    0x81
 #TODO: Change this back if trying to do AMD PID!!!
-PID_START_MOTORS	    =   0x81
+PID_START_MOTORS	      =   0x81
 SET_PID_GAINS           =   0x82
 GET_PID_TELEMETRY       =   0x83
-GET_AMS_POS		        =   0x84
-GET_IMU_LOOP_ZGYRO      =   0x85
+GET_AMS_POS		          =   0x84
+STREAM_TELEMETRY        =   0x85
 SET_MOVE_QUEUE          =   0x86
 SET_STEERING_GAINS      =   0x87
 SOFTWARE_RESET          =   0x88
@@ -71,6 +71,6 @@ ZERO_POS                =   0x90
 START_TIMED_RUN         =   0x91
 PID_STOP_MOTORS         =   0x92
 SET_PHASE               =   0x93
-SET_MOTOR_MODE      =   0x94
+SET_MOTOR_MODE          =   0x94
 
 # CMD values of 0xF0(240) - 0xFF(255) are reserved for future use

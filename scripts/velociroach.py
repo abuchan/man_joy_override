@@ -171,6 +171,9 @@ class Velociroach:
             tries = tries + 1
             time.sleep(0.1)
     
+    def streamTelemetry(self, stream = 0):
+      self.tx(0, command.STREAM_TELEMETRY, pack('b', stream))
+
     ######TODO : sort out this function and flashReadback below
     def downloadTelemetry(self, timeout = 5, retry = True):
         #suppress callback output messages for the duration of download

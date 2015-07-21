@@ -10,14 +10,17 @@ import shared_multi as shared
 #Dictionary of packet formats, for unpack()
 pktFormat = { \
     command.TX_DUTY_CYCLE:          'l3f', \
-    command.GET_IMU_DATA:           'l6h', \
+    
+    command.GET_IMU_DATA:           '=l6h', \
+    command.STREAM_TELEMETRY:       'b', \
+    
     command.TX_SAVED_STATE_DATA:    'l3f', \
     command.SET_THRUST_OPEN_LOOP:   '', \
     command.PID_START_MOTORS:       '', \
     command.SET_PID_GAINS:          '10h', \
     command.GET_PID_TELEMETRY:      '', \
     command.GET_AMS_POS:            '=2l', \
-    command.GET_IMU_LOOP_ZGYRO:     '='+2*'Lhhh', \
+    #command.GET_IMU_LOOP_ZGYRO:     '='+2*'Lhhh', \
     command.SET_MOVE_QUEUE:         '', \
     command.SET_STEERING_GAINS:     '6h', \
     command.SOFTWARE_RESET:         '', \
@@ -65,8 +68,12 @@ def xbee_received(packet):
         if type == command.GET_IMU_DATA:
             datum = unpack(pattern, data)
             if (datum[0] != -1):
-                shared.imudata.append(datum)
-                print "got datum:",datum
+                shared.imu_queues[src_addr].put(datum)
+        if type == command.STREAM_TELEMETRY:
+            datum = unpack(pattern, data)
+            if (datum[0] != -1):
+                print "Ack StreamTelemetry:",datum
+        
         # TX_SAVED_STATE_DATA
         elif type == command.TX_SAVED_STATE_DATA:
             datum = unpack(pattern, data)

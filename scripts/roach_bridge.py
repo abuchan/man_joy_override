@@ -1,9 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import rospy
+from man_joy_override.srv import *
 from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Imu
 
 from threading import Condition
+from Queue import Queue
+from collections import OrderedDict
 
 # Roach Imports
 import command
@@ -30,10 +34,27 @@ class RoachBridge():
     self.states = [[0.0,0.0]]*self.n_robots
     
     rospy.init_node('roach_bridge')
-  
-    for i in range(self.n_robots):
-      rospy.Subscriber('robot%d/cmd_vel' % (i+self.robot_offset), Twist, self.curried_callback(i))
+    
+    shared.imu_queues = OrderedDict()
+    self.imu_pubs = []
 
+    for i in range(self.n_robots):
+      shared.imu_queues[self.robots[i].DEST_ADDR_int] = Queue()
+      self.imu_pubs.append(rospy.Publisher(
+        'robot%d/imu' % (i+self.robot_offset),Imu,queue_size=10
+      ))
+      rospy.Subscriber(
+        'robot%d/cmd_vel' % (i+self.robot_offset),
+        Twist, 
+        self.curried_callback(i)
+      )
+      rospy.Service(
+        'robot%d/stream_telemetry' % (i+self.robot_offset), 
+        StreamTelemetry, 
+        self.curried_service(i)
+      )
+
+    
     self.rate = rospy.Rate(5.0)
 
     self.lock = Condition()
@@ -70,6 +91,15 @@ class RoachBridge():
 
   def curried_callback(self, robot_id):
     return lambda m: self.command_callback(m, robot_id)
+
+  def stream_telemetry(self, req, robot_id):
+    self.lock.acquire()
+    self.robots[robot_id].streamTelemetry(req.stream)
+    self.lock.release()
+    return StreamTelemetryResponse()
+
+  def curried_service(self, robot_id):
+    return lambda m: self.stream_telemetry(m, robot_id)
 
   def init_ams(self, robot):
     motorgains = [1800,100,100,0,0, 1800,100,100,0,0]
@@ -113,7 +143,7 @@ class RoachBridge():
     robot.setMotorGains(motorgains, retries = 1)
 
   def set_bemf(self, state, robot):
-    print 'Setting robot 0x%02X to %s' % (robot.DEST_ADDR_int,state)
+    #print 'Setting robot 0x%02X to %s' % (robot.DEST_ADDR_int,state)
     robot.setMotorSpeeds(state[0],state[1])
 
   def run(self):
@@ -132,7 +162,20 @@ class RoachBridge():
         self.set_bemf(state,robot)
 
       self.lock.release()
-
+      
+      for q,p in zip(shared.imu_queues.values(),self.imu_pubs):
+        while not q.empty():
+          d = q.get()
+          i = Imu()
+          i.header.seq = d[0]
+          i.header.stamp = rospy.Time.now()
+          i.angular_velocity.x = d[4]
+          i.angular_velocity.y = d[5]
+          i.angular_velocity.z = d[6]
+          i.linear_acceleration.x = d[1]
+          i.linear_acceleration.y = d[2]
+          i.linear_acceleration.z = d[3]
+          p.publish(i)
       self.rate.sleep()
     
     print 'Stopping robots'
