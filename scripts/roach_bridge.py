@@ -166,7 +166,7 @@ class RoachBridge():
     robot.query(retries = 1)
 
   def set_open(self, state, robot):
-    robot.setThrustOpenLoop(self,state[0],state[1])
+    robot.setThrustOpenLoop(state[0],state[1])
 
   def run(self):
     print 'RoachBridge running'
