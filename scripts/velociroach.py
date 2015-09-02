@@ -86,7 +86,9 @@ class Velociroach:
             time.sleep(0.1)   
     
     def setThrustOpenLoop(self, thrust_left=0, thrust_right=0, run_time=0):
-      self.tx(0, command.SET_THRUST_OPEN_LOOP, pack('hhh', thrust_left, thrust_right, run_time))
+      #self.tx(0, command.SET_THRUST_OPEN_LOOP, pack('hhh', thrust_left, thrust_right, run_time))
+      self.tx(0, command.SET_THRUST_OPEN_LOOP, pack('hh', 3, thrust_left))
+      self.tx(0, command.SET_THRUST_OPEN_LOOP, pack('hh', 4, thrust_right))
     
     def PIDStartMotors(self):
       self.tx(0, command.PID_START_MOTORS)

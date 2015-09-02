@@ -17,6 +17,7 @@ from velociroach import *
 import shared_multi as shared
 
 DEFAULT_ADDRS = ['\x20\x72','\x20\x73']
+#DEFAULT_ADDRS = ['\x30\x22']
 
 MIN_VEL = 0.5
 
@@ -82,9 +83,20 @@ class RoachBridge():
     l = -int(lv*v + la*(abs(a) - a)/2)
     return [l,r]
   
+  def command_to_state_open(self, command):
+    lv = 200
+    la = 200
+    v = command.linear.x
+    a = command.angular.z
+    r = int(lv*v + la*(abs(a) + a)/2)
+    l = -int(lv*v + la*(abs(a) - a)/2)
+    return [l,r]
+  
   def command_callback(self, command, robot_id):
     #state = self.command_to_state_ams(command)
+    #state = self.command_to_state_open(command)
     state = self.command_to_state_bemf(command)
+    
     self.lock.acquire()
     self.states[robot_id] = state
     self.lock.release()
@@ -145,12 +157,23 @@ class RoachBridge():
   def set_bemf(self, state, robot):
     #print 'Setting robot 0x%02X to %s' % (robot.DEST_ADDR_int,state)
     robot.setMotorSpeeds(state[0],state[1])
+  
+  def init_open(self, robot):
+    robot.reset()
+    time.sleep(0.5)
+    
+    # Send robot a WHO_AM_I command, verify communications
+    robot.query(retries = 1)
+
+  def set_open(self, state, robot):
+    robot.setThrustOpenLoop(self,state[0],state[1])
 
   def run(self):
     print 'RoachBridge running'
     
     for robot in self.robots:
       #self.init_ams(robot)
+      #self.init_open(robot)
       self.init_bemf(robot)
 
     print 'Robots started'
@@ -159,6 +182,7 @@ class RoachBridge():
       self.lock.acquire()
       for state, robot in zip(self.states, self.robots):
         #self.set_ams(state,robot)
+        #self.set_open(state,robot)
         self.set_bemf(state,robot)
 
       self.lock.release()
