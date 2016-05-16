@@ -16,7 +16,8 @@ import serial
 from velociroach import *
 import shared_multi as shared
 
-DEFAULT_ADDRS = ['\x20\x72','\x20\x73']
+#DEFAULT_ADDRS = ['\x20\x72','\x20\x73']
+DEFAULT_ADDRS = ['\x20\x72']
 #DEFAULT_ADDRS = ['\x30\x22']
 
 MIN_VEL = 0.5
@@ -75,12 +76,12 @@ class RoachBridge():
     return [l,r]
 
   def command_to_state_bemf(self, command):
-    lv = 20.0
-    la = 20.0
+    lv = 10.0
+    la = 10.0
     v = command.linear.x
     a = command.angular.z
-    r = int(lv*v + la*(abs(a) + a)/2)
-    l = -int(lv*v + la*(abs(a) - a)/2)
+    r = int(lv*v + (la * a))
+    l = -int(lv*v - (la * a))
     return [l,r]
   
   def command_to_state_open(self, command):
@@ -155,7 +156,7 @@ class RoachBridge():
     robot.setMotorGains(motorgains, retries = 1)
 
   def set_bemf(self, state, robot):
-    #print 'Setting robot 0x%02X to %s' % (robot.DEST_ADDR_int,state)
+    print 'Setting robot 0x%02X to %s' % (robot.DEST_ADDR_int,state)
     robot.setMotorSpeeds(state[0],state[1])
   
   def init_open(self, robot):
