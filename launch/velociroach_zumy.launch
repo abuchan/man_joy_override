@@ -1,5 +1,8 @@
 <launch>
-  <node pkg="man_joy_override" name="man_joy" type="mjo.py" />
+  <node pkg="man_joy_override" name="man_joy" type="mjo.py">
+    <remap from="/robot1/cmd_vel" to="/odroid1/cmd_vel" />
+  </node>
+
   <node pkg="man_joy_override" name="roach_bridge" type="roach_bridge.py" output="screen"/>
   <node pkg="joy" name="joystick" type="joy_node" />
 </launch>
