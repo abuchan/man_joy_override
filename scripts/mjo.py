@@ -30,10 +30,14 @@ class ManJoyState():
     
     # update desired destinations based on buttons
     buttons = []
-    buttons.append([joy_msg.axes[6] == 1, joy_msg.axes[7]==1, 
-                    joy_msg.axes[6] == -1, joy_msg.axes[7]== -1])
-    buttons.append([joy_msg.buttons[2]==1, joy_msg.buttons[3]==1,
-                    joy_msg.buttons[1]==1, joy_msg.buttons[0]==1])
+    
+    buttons.append([joy_msg.buttons[7]==1, joy_msg.buttons[4]==1,
+                    joy_msg.buttons[5]==1, joy_msg.buttons[6]==1])
+    buttons.append([joy_msg.buttons[15]==1, joy_msg.buttons[12]==1,
+                    joy_msg.buttons[13]==1, joy_msg.buttons[14]==1])
+    
+    print self.joy_in
+    print buttons
 
     for d in range(N_STICK):
       if True in buttons[d]:
