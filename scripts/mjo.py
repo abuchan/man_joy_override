@@ -26,7 +26,7 @@ class ManJoyState():
     self.lock.acquire()
     # update joy_in based on analog axes
     self.joy_in[0] = (joy_msg.axes[1], joy_msg.axes[0])
-    self.joy_in[1] = (joy_msg.axes[4], joy_msg.axes[3])
+    self.joy_in[1] = (joy_msg.axes[3], joy_msg.axes[2])
     
     # update desired destinations based on buttons
     buttons = []
